@@ -28953,7 +28953,7 @@ var render = function() {
                   _c("cancel-button", {
                     on: {
                       click: function($event) {
-                        return _vm.$emit("cancelled")
+                        return _vm.$router.back()
                       }
                     }
                   }),
@@ -30346,7 +30346,6 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 //
 //
 //
-//
 
 
 
@@ -30507,25 +30506,6 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
       return handleSubmit;
     }(),
-    handleCancelled: function handleCancelled(formData) {
-      if (this.mode === 'form') {
-        if (!this.resourceId) {
-          return this.$router.back();
-        }
-
-        Nova.request().post('/nova-api/' + this.resourceName + '/step/' + this.step + '/cancelled', formData, {
-          params: {
-            resourceId: this.resourceId,
-            resource: this.resource,
-            resourceName: this.resourceName
-          }
-        });
-
-        return this.$router.back();
-      }
-
-      return this.$emit('cancelled');
-    },
 
 
     /**
@@ -30690,8 +30670,7 @@ var render = function() {
         },
         on: {
           "update-last-retrieved-at-timestamp":
-            _vm.updateLastRetrievedAtTimestamp,
-          cancelled: _vm.handleCancelled
+            _vm.updateLastRetrievedAtTimestamp
         }
       })
     ],

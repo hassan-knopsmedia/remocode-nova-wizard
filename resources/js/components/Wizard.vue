@@ -24,7 +24,7 @@
 
           <!-- Create Button -->
             <div class="flex items-center">
-                <cancel-button @click="$emit('cancelled')" />
+                <cancel-button @click="$router.back()" />
 
                 <progress-button
                     dusk="previous-step"
