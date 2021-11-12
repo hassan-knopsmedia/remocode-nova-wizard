@@ -131,7 +131,7 @@ export default {
         return this.$router.back();
       }
 
-      return this.$emit('cancelled-update')
+      return this.$emit('cancelled')
     },
 
     /**

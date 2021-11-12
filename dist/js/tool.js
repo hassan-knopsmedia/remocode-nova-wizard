@@ -30524,7 +30524,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
         return this.$router.back();
       }
 
-      return this.$emit('cancelled-update');
+      return this.$emit('cancelled');
     },
 
 
