@@ -1,9 +1,9 @@
 <?php
 
-namespace Remocodebe\NovaWizard\Http\Controllers;
+namespace Remocode\NovaWizard\Http\Controllers;
 
 use Illuminate\Routing\Controller; 
-use Remocodebe\NovaWizard\Http\Requests\CreateResourceRequest;
+use Remocode\NovaWizard\Http\Requests\CreateResourceRequest;
 
 class CreationFieldController extends Controller
 {

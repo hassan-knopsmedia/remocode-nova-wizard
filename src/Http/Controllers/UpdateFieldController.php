@@ -1,6 +1,6 @@
 <?php
 
-namespace Remocodebe\NovaWizard\Http\Controllers;
+namespace Remocode\NovaWizard\Http\Controllers;
 
 use Illuminate\Routing\Controller;
 use Laravel\Nova\Http\Requests\NovaRequest;

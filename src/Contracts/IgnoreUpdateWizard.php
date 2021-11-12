@@ -1,6 +1,6 @@
 <?php
 
-namespace Remocodebe\NovaWizard\Contracts;
+namespace Remocode\NovaWizard\Contracts;
  
 
 interface IgnoreUpdateWizard 

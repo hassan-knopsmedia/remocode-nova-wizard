@@ -1,5 +1,5 @@
 {
-    "name": "remocodebe/nova-wizard",
+    "name": "remocode/nova-wizard",
     "description": "A Laravel Nova tool.",
     "keywords": [
         "laravel",
@@ -17,7 +17,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Remocodebe\\NovaWizard\\ToolServiceProvider"
+                "Remocode\\NovaWizard\\ToolServiceProvider"
             ]
         }
     },

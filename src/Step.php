@@ -1,6 +1,6 @@
 <?php 
 
-namespace Remocodebe\NovaWizard;
+namespace Remocode\NovaWizard;
 
 
 use Laravel\Nova\Panel;

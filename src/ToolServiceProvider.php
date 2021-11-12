@@ -1,6 +1,6 @@
 <?php
 
-namespace Remocodebe\NovaWizard;
+namespace Remocode\NovaWizard;
 
 use Illuminate\Support\ServiceProvider; 
 use Illuminate\Support\Facades\Route;
@@ -45,7 +45,7 @@ class ToolServiceProvider extends ServiceProvider
             ]
         ]); 
 
-        Nova::script('remocodebe-wizard', __DIR__.'/../dist/js/tool.js');
+        Nova::script('remocode-wizard', __DIR__.'/../dist/js/tool.js');
     }
 
     /**
