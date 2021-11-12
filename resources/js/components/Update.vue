@@ -111,6 +111,29 @@ export default {
       this.handleNext(formData, true, close)
     },
 
+    handleCancelled(formData) {
+      if (this.mode === 'form') {
+        if (!this.resourceId) {
+          return this.$router.back()
+        }
+
+        Nova.request().post(
+            `/nova-api/${this.resourceName}/step/${this.step}/cancelled`,
+            formData,
+            {
+              params: {
+                resourceId: this.resourceId,
+                resource: this.resource,
+                resourceName: this.resourceName,
+              },
+            });
+
+        return this.$router.back();
+      }
+
+      return this.$emit('cancelled-update')
+    },
+
     /**
      * Update the resource using the provided data.
      */

@@ -30507,6 +30507,25 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
       return handleSubmit;
     }(),
+    handleCancelled: function handleCancelled(formData) {
+      if (this.mode === 'form') {
+        if (!this.resourceId) {
+          return this.$router.back();
+        }
+
+        Nova.request().post('/nova-api/' + this.resourceName + '/step/' + this.step + '/cancelled', formData, {
+          params: {
+            resourceId: this.resourceId,
+            resource: this.resource,
+            resourceName: this.resourceName
+          }
+        });
+
+        return this.$router.back();
+      }
+
+      return this.$emit('cancelled-update');
+    },
 
 
     /**
