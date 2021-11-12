@@ -65,3 +65,6 @@ By default; each step, except the last, will store in the session. if you need t
 ## Ignore Wizard On Update
 
 For ignoring `wizard-form` on the update page, your resource should implement the `Remocodebe\NovaWizard\Contracts\IgnoreUpdateWizard`. 
+
+
+### This package by developed by and all credit goes to https://github.com/zareismail
