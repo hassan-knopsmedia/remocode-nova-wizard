@@ -1,37 +1,33 @@
 <template>
-  <loading-view :loading="loading">
-    <custom-update-header
-      class="mb-3"
-      :resource-name="resourceName"
-      :resource-id="resourceId"
-    />
+    <loading-view :loading="loading">
+        <custom-update-header
+            class="mb-3"
+            :resource-name="resourceName"
+            :resource-id="resourceId"
+        />
 
-    <wizard-form 
-      @update-last-retrieved-at-timestamp="updateLastRetrievedAtTimestamp"
-      :navigation="$route.navigable"
-      :resource-name="resourceName"
-      :resource-id="resourceId"
-      :via-resource="viaResource"
-      :via-resource-id="viaResourceId"
-      :via-relationship="viaRelationship"
-      :panels="panelsWithFields"
-      :next-handler="handleNext"
-      :previous-handler="handlePrevious"
-      :submit-handler="handleSubmit"
-      :submit="__('Update :resource', { resource: singularName })"
-      :submit-and-stay="__('Update & Continue Editing')"
-      :validation-errors="validationErrors" 
-      @cancelled="handleCancelled"
-    />   
-  </loading-view>
+        <wizard-form
+            @update-last-retrieved-at-timestamp="updateLastRetrievedAtTimestamp"
+            :navigation="$route.navigable"
+            :resource-name="resourceName"
+            :resource-id="resourceId"
+            :via-resource="viaResource"
+            :via-resource-id="viaResourceId"
+            :via-relationship="viaRelationship"
+            :panels="panelsWithFields"
+            :next-handler="handleNext"
+            :previous-handler="handlePrevious"
+            :submit-handler="handleSubmit"
+            :submit="__('Update :resource', { resource: singularName })"
+            :submit-and-stay="__('Update & Continue Editing')"
+            :validation-errors="validationErrors"
+            @cancelled="handleCancelled"
+        />
+    </loading-view>
 </template>
 
 <script>
-import {
-  mapProps,
-  Errors,
-  InteractsWithResourceInformation,
-} from 'laravel-nova'
+import {mapProps, Errors, InteractsWithResourceInformation} from 'laravel-nova'
 import HandlesSteps from './HandlesSteps'
 
 export default {
@@ -47,22 +43,22 @@ export default {
 
   data: () => ({
     relationResponse: null,
-    loading: true, 
+    loading: true,
     validationErrors: new Errors(),
     lastRetrievedAt: null,
   }),
 
-  async created() { 
+  async created() {
     if (Nova.missingResource(this.resourceName))
-      return this.$router.push({ name: '404' })
+      return this.$router.push({name: '404'})
 
     this.initializeStep()
 
     // If this update is via a relation index, then let's grab the field
     // and use the label for that as the one we use for the title and buttons
     if (this.isRelation) {
-      const { data } = await Nova.request(
-        `/nova-api/${this.viaResource}/field/${this.viaRelationship}`
+      const {data} = await Nova.request(
+          `/nova-api/${this.viaResource}/field/${this.viaRelationship}`
       )
       this.relationResponse = data
     }
@@ -82,10 +78,91 @@ export default {
       this.fields = []
 
       const {
-        data: { panels, fields },
+        data: {panels, fields},
       } = await Nova.request()
-        .get(
-          `/nova-api/${this.resourceName}/${this.resourceId}/update-fields`, 
+          .get(
+              `/nova-api/${this.resourceName}/${this.resourceId}/update-fields`,
+              {
+                params: {
+                  step: this.step,
+                  editing: true,
+                  editMode: 'update',
+                  viaResource: this.viaResource,
+                  viaResourceId: this.viaResourceId,
+                  viaRelationship: this.viaRelationship,
+                },
+              }
+          )
+          .catch(error => {
+            if (error.response.status === 404) {
+              this.$router.push({name: '404'})
+              return
+            }
+          })
+
+      this.panels = panels
+      this.fields = fields
+      this.loading = false
+
+      Nova.$emit('resource-loaded')
+    },
+
+    async handleSubmit(formData, close) {
+      this.handleNext(formData, true, close)
+    },
+
+    /**
+     * Update the resource using the provided data.
+     */
+    async handleNext(formData, submit = false) {
+      try {
+        const {
+          data: {redirect},
+        } = await this.updateRequest(formData)
+
+        Nova.success(
+            this.__('The :resource was updated!', {
+              resource: this.resourceInformation.singularLabel.toLowerCase(),
+            })
+        )
+
+        await this.updateLastRetrievedAtTimestamp()
+
+        if (submit) {
+          this.$router.push({path: redirect})
+        } else {
+          this.step = submit ? 0 : this.step + 1;
+
+          this.validationErrors = new Errors()
+
+          await this.getFields()
+        }
+      } catch (error) {
+        if (error.response.status === 422) {
+          this.validationErrors = new Errors(error.response.data.errors)
+          Nova.error(this.__('There was a problem submitting the form.'))
+        }
+
+        if (error.response.status === 409) {
+          Nova.error(
+              this.__(
+                  'Another user has updated this resource since this page was loaded. Please refresh the page and try again.'
+              )
+          )
+        }
+      }
+    },
+
+    /**
+     * Send an update request for this resource
+     */
+    updateRequest(formData) {
+      return Nova.request().post(
+          `/nova-api/${this.resourceName}/${this.resourceId}`,
+          _.tap(formData, (formData) => {
+            formData.append('_method', 'PUT')
+            formData.append('_retrieved_at', this.lastRetrievedAt)
+          }),
           {
             params: {
               step: this.step,
@@ -96,88 +173,6 @@ export default {
               viaRelationship: this.viaRelationship,
             },
           }
-        )
-        .catch(error => {
-          if (error.response.status == 404) {
-            this.$router.push({ name: '404' })
-            return
-          }
-        })
-
-      this.panels = panels
-      this.fields = fields
-      this.loading = false
-
-      Nova.$emit('resource-loaded')
-    },  
-
-    async handleSubmit(formData, close) {
-      this.handleNext(formData, true, close)
-    }, 
-
-    /**
-     * Update the resource using the provided data.
-     */
-    async handleNext(formData, submit = false) {  
-      try {
-        const {
-          data: { redirect },
-        } = await this.updateRequest(formData)
-
-        Nova.success(
-          this.__('The :resource was updated!', {
-            resource: this.resourceInformation.singularLabel.toLowerCase(),
-          })
-        )
-
-        await this.updateLastRetrievedAtTimestamp() 
-
-        if(submit) {
-          this.$router.push({ path: redirect }) 
-        } 
-        else { 
-          this.step = submit ? 0 : this.step + 1;
-
-          this.validationErrors = new Errors() 
-
-          await this.getFields()  
-        } 
-      } catch (error) {  
-        if (error.response.status == 422) {
-          this.validationErrors = new Errors(error.response.data.errors)
-          Nova.error(this.__('There was a problem submitting the form.'))
-        }
-
-        if (error.response.status == 409) {
-          Nova.error(
-            this.__(
-              'Another user has updated this resource since this page was loaded. Please refresh the page and try again.'
-            )
-          )
-        }
-      } 
-    },
-
-    /**
-     * Send an update request for this resource
-     */
-    updateRequest(formData) { 
-      return Nova.request().post(
-        `/nova-api/${this.resourceName}/${this.resourceId}`,
-        _.tap(formData, (formData) => { 
-          formData.append('_method', 'PUT')
-          formData.append('_retrieved_at', this.lastRetrievedAt) 
-        }),
-        {
-          params: {
-            step: this.step,
-            editing: true,
-            editMode: 'update',
-            viaResource: this.viaResource,
-            viaResourceId: this.viaResourceId,
-            viaRelationship: this.viaRelationship,
-          },
-        }
       )
     },
 
@@ -186,10 +181,10 @@ export default {
      */
     updateLastRetrievedAtTimestamp() {
       this.lastRetrievedAt = Math.floor(new Date().getTime() / 1000)
-    }, 
+    },
   },
 
-  computed: {    
+  computed: {
     singularName() {
       if (this.relationResponse) {
         return this.relationResponse.singularLabel
@@ -200,7 +195,7 @@ export default {
 
     isRelation() {
       return Boolean(this.viaResourceId && this.viaRelationship)
-    }, 
+    },
   },
 }
 </script>

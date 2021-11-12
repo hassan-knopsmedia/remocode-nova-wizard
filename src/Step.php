@@ -1,52 +1,50 @@
-<?php 
+<?php
 
 namespace Remocode\NovaWizard;
-
 
 use Laravel\Nova\Panel;
 use Laravel\Nova\Http\Requests\NovaRequest;
 
-
 class Step extends Panel
 {
-	protected static $steps = [];  
+	protected static $steps = [];
 
-	protected static $step = 0;  
+	protected static $step = 0;
 
-    /**
-     * Create a new panel instance.
-     *
-     * @param  string  $name
-     * @param  \Closure|array  $fields
-     * @return void
-     */
-    public function __construct($name, $fields = [])
-    {  
-        $request = app(NovaRequest::class); 
-        
-        if($request->isCreateOrAttachRequest() || (
-            $request->isUpdateOrUpdateAttachedRequest() && 
-            ! is_subclass_of($request->resource(), Contracts\IgnoreUpdateWizard::class)
-        )) {
-            isset(static::$steps[$name]) || static::$steps[$name] = static::$step++;
+	/**
+	 * Create a new panel instance.
+	 *
+	 * @param string         $name
+	 * @param \Closure|array $fields
+	 * @return void
+	 */
+	public function __construct($name, $fields = [])
+	{
+		$request = app(NovaRequest::class);
 
-            $fields = static::$steps[$name] != request('step') ? [] : $fields; 
+		if ($request->isCreateOrAttachRequest() || (
+				$request->isUpdateOrUpdateAttachedRequest() &&
+				!is_subclass_of($request->resource(), Contracts\IgnoreUpdateWizard::class)
+			)) {
+			isset(static::$steps[$name]) || static::$steps[$name] = static::$step++;
 
-            $this->withMeta([
-                'step' => static::$steps[$name], 
-                'passed' => static::$steps[$name] < request('step') 
-            ]);
-        } 
+			$fields = static::$steps[$name] != request('step') ? [] : $fields;
 
-        parent::__construct($name, $fields); 
-    }
+			$this->withMeta([
+				'step'   => static::$steps[$name],
+				'passed' => static::$steps[$name] < request('step'),
+			]);
+		}
 
-    public function checkpoint()
-    {
-    	$this->withMeta([
-    		'checkpoint' => true
-    	]);
+		parent::__construct($name, $fields);
+	}
 
-        return $this;
-    }
+	public function checkpoint()
+	{
+		$this->withMeta([
+			'checkpoint' => true,
+		]);
+
+		return $this;
+	}
 }

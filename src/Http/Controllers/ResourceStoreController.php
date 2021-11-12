@@ -9,83 +9,85 @@ use Laravel\Nova\Nova;
 
 class ResourceStoreController extends Controller
 {
-    /**
-     * Create a new resource.
-     *
-     * @param  \Laravel\Nova\Http\Requests\CreateResourceRequest  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function handle(CreateResourceRequest $request)
-    {
-        $resource = $request->resource();
+	/**
+	 * Create a new resource.
+	 *
+	 * @param \Laravel\Nova\Http\Requests\CreateResourceRequest $request
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	public function handle(CreateResourceRequest $request)
+	{
+		$resource = $request->resource();
 
-        $resource::authorizeToCreate($request);
+		$resource::authorizeToCreate($request);
 
-        $resource::validateForCreation($request);
+		$resource::validateForCreation($request);
 
-        $model = DB::transaction(function () use ($request, $resource) {
-            [$model, $callbacks] = $resource::fill(
-                $request, $request->findModelOrNew()
-            );
+		$model = DB::transaction(function () use ($request, $resource) {
+			[$model, $callbacks] = $resource::fill(
+				$request, $request->findModelOrNew()
+			);
 
-            if(is_null($model->getKey()) && $request->viaSession == 'true') {
-                return $model;
-            }
+			if (is_null($model->getKey()) && $request->viaSession == 'true') {
+				return $model;
+			}
 
-            if ($request->viaRelationship()) {
-                $request->findParentModelOrFail()
-                        ->{$request->viaRelationship}()
-                        ->save($model);
-            } else {
-                $model->save();
-            }
+			if ($request->viaRelationship()) {
+				$request->findParentModelOrFail()
+					->{$request->viaRelationship}()
+					->save($model);
+			} else {
+				$model->save();
+			}
 
-            Nova::actionEvent()->forResourceCreate($request->user(), $model)->save();
+			Nova::actionEvent()->forResourceCreate($request->user(), $model)->save();
 
-            collect($callbacks)->each->__invoke();
+			collect($callbacks)->each->__invoke();
 
-            return $model;
-        });
+			return $model;
+		});
 
-        $this->refreshTheResourceCheckpoint($request, $resource, $model);
+		$this->refreshTheResourceCheckpoint($request, $resource, $model);
 
-        return response()->json([
-            'id' => $model->getKey(),
-            'resource' => $model->attributesToArray(),
-            'redirect' => $resource::redirectAfterCreate($request, $request->newResourceWith($model)),
-        ], 200);
-    }
+		return response()->json([
+			'id'       => $model->getKey(),
+			'resource' => $model->attributesToArray(),
+			'redirect' => $resource::redirectAfterCreate($request, $request->newResourceWith($model)),
+		], 200);
+	}
 
-    /**
-     * Determine if this request is an checkpoint request.
-     *
-     * @return bool
-     */
-    public function refreshTheResourceCheckpoint(CreateResourceRequest $request, $resource, $model)
-    {
-        if($request->isSubmitRequest()) {
-            $request->session()->remove($resource::uriKey());
-        } else if(! is_null($model->getKey())) {
-            $request->session()->put("{$resource::uriKey()}.step", $request->step);
-            $request->session()->put("{$resource::uriKey()}.instance", null);
-        } else {
-            $request->session()->put("{$resource::uriKey()}.step", $request->step);
-            $request->session()->put("{$resource::uriKey()}.instance", $model);
-        }
+	/**
+	 * Determine if this request is an checkpoint request.
+	 *
+	 * @return bool
+	 */
+	public function refreshTheResourceCheckpoint(CreateResourceRequest $request, $resource, $model)
+	{
+		if ($request->isSubmitRequest()) {
+			$request->session()->remove($resource::uriKey());
+		} elseif (!is_null($model->getKey())) {
+			$request->session()->put("{$resource::uriKey()}.step", $request->step);
+			$request->session()->put("{$resource::uriKey()}.instance", null);
+		} else {
+			$request->session()->put("{$resource::uriKey()}.step", $request->step);
+			$request->session()->put("{$resource::uriKey()}.instance", $model);
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function clearSession(CreateResourceRequest $request) {
-        $request->session()->remove($request->resource()::uriKey());
+	public function clearSession(CreateResourceRequest $request)
+	{
+		$request->session()->remove($request->resource()::uriKey());
 
-        return response()->json([ 'status' => 'OK' ]);
-    }
+		return response()->json(['status' => 'OK']);
+	}
 
-    public function cancelSession(CreateResourceRequest $request, $model) {
-        $resource = $request->resource();
-        $model = $request->findModelOrNew();
-        $model->delete();
-        return response()->json([ 'status' => 'OK' ]);
-    }
+	public function cancelSession(CreateResourceRequest $request, $model)
+	{
+		$resource = $request->resource();
+		$model = $request->findModelOrNew();
+		$model->delete();
+		return response()->json(['status' => 'OK']);
+	}
 }

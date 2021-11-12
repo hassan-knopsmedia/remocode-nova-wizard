@@ -27594,75 +27594,75 @@ if (hadRuntime) {
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
 /* harmony default export */ __webpack_exports__["a"] = ({
-  data: function data() {
-    return {
-      fields: [],
-      panels: [],
-      step: 0
-    };
-  },
+	data: function data() {
+		return {
+			fields: [],
+			panels: [],
+			step: 0
+		};
+	},
 
-  methods: {
-    initializeStep: function initializeStep() {
-      if (this.lastStep > this.step) {
-        this.step = this.lastStep;
-      }
-      if (this.step < 0) {
-        this.step = 0;
-      }
-    },
-    handlePrevious: function () {
-      var _ref = _asyncToGenerator( /*#__PURE__*/__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.mark(function _callee() {
-        return __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                this.step && --this.step;
+	methods: {
+		initializeStep: function initializeStep() {
+			if (this.lastStep > this.step) {
+				this.step = this.lastStep;
+			}
+			if (this.step < 0) {
+				this.step = 0;
+			}
+		},
+		handlePrevious: function () {
+			var _ref = _asyncToGenerator( /*#__PURE__*/__WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.mark(function _callee() {
+				return __WEBPACK_IMPORTED_MODULE_0_babel_runtime_regenerator___default.a.wrap(function _callee$(_context) {
+					while (1) {
+						switch (_context.prev = _context.next) {
+							case 0:
+								this.step && --this.step;
 
-                _context.next = 3;
-                return this.getFields();
+								_context.next = 3;
+								return this.getFields();
 
-              case 3:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
+							case 3:
+							case "end":
+								return _context.stop();
+						}
+					}
+				}, _callee, this);
+			}));
 
-      function handlePrevious() {
-        return _ref.apply(this, arguments);
-      }
+			function handlePrevious() {
+				return _ref.apply(this, arguments);
+			}
 
-      return handlePrevious;
-    }()
-  },
+			return handlePrevious;
+		}()
+	},
 
-  computed: {
-    lastStep: function lastStep() {
-      return this.$route.params.step;
-    },
-    currentPanel: function currentPanel() {
-      return this.panelsWithFields[this.step];
-    },
-    panelsWithFields: function panelsWithFields() {
-      var _this = this;
+	computed: {
+		lastStep: function lastStep() {
+			return this.$route.params.step;
+		},
+		currentPanel: function currentPanel() {
+			return this.panelsWithFields[this.step];
+		},
+		panelsWithFields: function panelsWithFields() {
+			var _this = this;
 
-      return _.map(this.panels, function (panel) {
-        return {
-          name: panel.name,
-          step: panel.step,
-          passed: panel.passed,
-          checkpoint: panel.checkpoint,
-          fields: _.filter(_this.fields, function (field) {
-            return field.panel == panel.name;
-          })
-        };
-      }).filter(function (panel) {
-        return panel.step != undefined;
-      });
-    }
-  }
+			return _.map(this.panels, function (panel) {
+				return {
+					name: panel.name,
+					step: panel.step,
+					passed: panel.passed,
+					checkpoint: panel.checkpoint,
+					fields: _.filter(_this.fields, function (field) {
+						return field.panel === panel.name;
+					})
+				};
+			}).filter(function (panel) {
+				return panel.step !== undefined;
+			});
+		}
+	}
 });
 
 /***/ }),
@@ -27678,33 +27678,51 @@ module.exports = __webpack_require__(29);
 /***/ (function(module, exports, __webpack_require__) {
 
 Nova.booting(function (Vue, router, store) {
-  Vue.component('wizard-form', __webpack_require__(6));
-  Vue.component('wizard-nav', __webpack_require__(12));
-  Vue.component('wizard-step', __webpack_require__(15));
+	Vue.component('wizard-form', __webpack_require__(6));
+	Vue.component('wizard-nav', __webpack_require__(12));
+	Vue.component('wizard-step', __webpack_require__(15));
 
-  router.beforeEach(function (to, from, next) {
-    var resource = _.find(Nova.config.wizard.resources, function (resource) {
-      return resource.key == to.params.resourceName;
-    });
+	/*router.beforeEach((to, from, next) => {
+ 	var resource = _.find(Nova.config.wizard.resources, (resource) => {
+ 		return resource.key === to.params.resourceName
+ 	});
+ 		if (resource !== undefined && to.name === 'create') {
+ 		to.matched[0].components.default = require('./components/Create.vue')
+ 			to.params.step = resource.step
+ 		to.params.navigable = resource.navigable
+ 			console.log('welcome to create wizard (:')
+ 	} else if (resource !== undefined && to.name === 'edit' && resource.update) {
+ 		to.matched[0].components.default = require('./components/Update.vue')
+ 			to.params.step = resource.step
+ 		to.params.navigable = resource.navigable
+ 			console.log('welcome to update wizard (:')
+ 	}
+ 		next()
+ })*/
 
-    if (resource != undefined && to.name == 'create') {
-      to.matched[0].components.default = __webpack_require__(23);
+	router.beforeEach(function (to, from, next) {
+		var resource = _.find(Nova.config.wizard.resources, function (resource) {
+			return resource.key === to.params.resourceName;
+		});
 
-      to.params.step = resource.step;
-      to.params.navigable = resource.navigable;
+		if (resource !== undefined && to.name === 'create') {
+			to.matched[0] = _(_.cloneDeep(to.matched[0])).tap(function (matched) {
+				matched.components.default = __webpack_require__(23);
+			}).value();
 
-      console.log('welcome to create wizard (:');
-    } else if (resource != undefined && to.name == 'edit' && resource.update) {
-      to.matched[0].components.default = __webpack_require__(26);
+			to.params.step = resource.step;
+			to.params.navigable = resource.navigable;
+		} else if (resource !== undefined && to.name === 'edit' && resource.update) {
+			to.matched[0] = _(_.cloneDeep(to.matched[0])).tap(function (matched) {
+				matched.components.default = __webpack_require__(26);
+			}).value();
 
-      to.params.step = resource.step;
-      to.params.navigable = resource.navigable;
+			to.params.step = resource.step;
+			to.params.navigable = resource.navigable;
+		}
 
-      console.log('welcome to update wizard (:');
-    }
-
-    next();
-  });
+		next();
+	});
 });
 
 /***/ }),
@@ -27771,7 +27789,6 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-//
 //
 //
 //
@@ -28066,7 +28083,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
     },
     steps: function steps() {
       return this.panels.filter(function (panel) {
-        return panel.step != undefined;
+        return panel.step !== undefined;
       });
     },
     currentPanel: function currentPanel() {
@@ -28873,26 +28890,26 @@ if (hadRuntime) {
 
 "use strict";
 /* harmony default export */ __webpack_exports__["a"] = ({
-  data: function data() {
-    return { isWorking: false };
-  },
+	data: function data() {
+		return { isWorking: false };
+	},
 
-  methods: {
-    /**
-     * Handle file upload finishing
-     */
-    handleFileUploadFinished: function handleFileUploadFinished() {
-      this.isWorking = false;
-    },
+	methods: {
+		/**
+   * Handle file upload finishing
+   */
+		handleFileUploadFinished: function handleFileUploadFinished() {
+			this.isWorking = false;
+		},
 
 
-    /**
-     * Handle file upload starting
-     */
-    handleFileUploadStarted: function handleFileUploadStarted() {
-      this.isWorking = true;
-    }
-  }
+		/**
+   * Handle file upload starting
+   */
+		handleFileUploadStarted: function handleFileUploadStarted() {
+			this.isWorking = true;
+		}
+	}
 });
 
 /***/ }),
@@ -28977,9 +28994,9 @@ var render = function() {
                         },
                         [
                           _vm._v(
-                            "\n        " +
+                            "\n              " +
                               _vm._s(_vm.__("Previous")) +
-                              "\n      "
+                              "\n            "
                           )
                         ]
                       )
@@ -28993,7 +29010,7 @@ var render = function() {
                           attrs: {
                             dusk: "next-step",
                             disabled:
-                              _vm.current == _vm.steps.length - 1 ||
+                              _vm.current === _vm.steps.length - 1 ||
                               _vm.isWorking,
                             processing: _vm.isWorking
                           },
@@ -29005,13 +29022,15 @@ var render = function() {
                         },
                         [
                           _vm._v(
-                            "\n        " + _vm._s(_vm.__("Next")) + "\n      "
+                            "\n              " +
+                              _vm._s(_vm.__("Next")) +
+                              "\n            "
                           )
                         ]
                       )
                     : _vm._e(),
                   _vm._v(" "),
-                  _vm.current == _vm.steps.length - 1
+                  _vm.current === _vm.steps.length - 1
                     ? _c(
                         "progress-button",
                         {
@@ -29029,15 +29048,15 @@ var render = function() {
                         },
                         [
                           _vm._v(
-                            "\n        " +
+                            "\n              " +
                               _vm._s(_vm.submitAndStay) +
-                              "\n      "
+                              "\n            "
                           )
                         ]
                       )
                     : _vm._e(),
                   _vm._v(" "),
-                  _vm.current == _vm.steps.length - 1
+                  _vm.current === _vm.steps.length - 1
                     ? _c(
                         "progress-button",
                         {
@@ -29053,7 +29072,13 @@ var render = function() {
                             }
                           }
                         },
-                        [_vm._v("\n        " + _vm._s(_vm.submit) + "\n      ")]
+                        [
+                          _vm._v(
+                            "\n              " +
+                              _vm._s(_vm.submit) +
+                              "\n            "
+                          )
+                        ]
                       )
                     : _vm._e()
                 ],
@@ -29308,7 +29333,7 @@ exports = module.exports = __webpack_require__(18)(false);
 
 
 // module
-exports.push([module.i, "\n.h-step {\n\theight: 6rem;\n} \n", ""]);
+exports.push([module.i, "\n.h-step {\n  height: 6rem;\n} \n", ""]);
 
 // exports
 
@@ -29683,25 +29708,25 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-	props: {
-		step: {
-			type: Object,
-			required: true
-		},
-		active: {
-			type: Boolean,
-			default: false
-		},
-		last: {
-			type: Boolean,
-			default: false
-		}
-	},
+  props: {
+    step: {
+      type: Object,
+      required: true
+    },
+    active: {
+      type: Boolean,
+      default: false
+    },
+    last: {
+      type: Boolean,
+      default: false
+    }
+  },
 
-	mounted: function mounted() {},
+  mounted: function mounted() {},
 
 
-	computed: {}
+  computed: {}
 });
 
 /***/ }),
@@ -30004,7 +30029,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
       return getFields;
     }(),
     handleCancelled: function handleCancelled(formData) {
-      if (this.mode == 'form') {
+      if (this.mode === 'form') {
         if (!this.resourceId) {
           return this.$router.back();
         }
@@ -30060,7 +30085,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
                 _context3.prev = 15;
                 _context3.t0 = _context3['catch'](0);
 
-                if (_context3.t0.response.status == 422) {
+                if (_context3.t0.response.status === 422) {
                   this.validationErrors = new __WEBPACK_IMPORTED_MODULE_1_laravel_nova__["Errors"](_context3.t0.response.data.errors);
                   Nova.error(this.__('There was a problem submitting the form.'));
                 }
@@ -30126,7 +30151,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
                 _context4.prev = 18;
                 _context4.t0 = _context4['catch'](0);
 
-                if (_context4.t0.response.status == 422) {
+                if (_context4.t0.response.status === 422) {
                   this.validationErrors = new __WEBPACK_IMPORTED_MODULE_1_laravel_nova__["Errors"](_context4.t0.response.data.errors);
                   Nova.error(this.__('There was a problem submitting the form.'));
                 }
@@ -30445,7 +30470,7 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
                     viaRelationship: this.viaRelationship
                   }
                 }).catch(function (error) {
-                  if (error.response.status == 404) {
+                  if (error.response.status === 404) {
                     _this.$router.push({ name: '404' });
                     return;
                   }
@@ -30557,12 +30582,12 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
                 _context4.prev = 18;
                 _context4.t0 = _context4['catch'](0);
 
-                if (_context4.t0.response.status == 422) {
+                if (_context4.t0.response.status === 422) {
                   this.validationErrors = new __WEBPACK_IMPORTED_MODULE_1_laravel_nova__["Errors"](_context4.t0.response.data.errors);
                   Nova.error(this.__('There was a problem submitting the form.'));
                 }
 
-                if (_context4.t0.response.status == 409) {
+                if (_context4.t0.response.status === 409) {
                   Nova.error(this.__('Another user has updated this resource since this page was loaded. Please refresh the page and try again.'));
                 }
 

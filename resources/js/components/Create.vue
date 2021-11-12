@@ -1,23 +1,23 @@
 <template>
-  <loading-view :loading="loading">
-    <custom-create-header class="mb-3" :resource-name="resourceName" />
-    <wizard-form
-      :navigation="$route.navigable"
-      :resource-name="resourceName"
-      :resource-id="resourceId"
-      :via-resource="viaResource"
-      :via-resource-id="viaResourceId"
-      :via-relationship="viaRelationship"
-      :panels="panelsWithFields"
-      :next-handler="handleNext"
-      :previous-handler="handlePrevious"
-      :submit-handler="handleSubmit"
-      :submit="__('Create :resource', { resource: singularName })"
-      :submit-and-stay="__('Create & Add Another')"
-      :validation-errors="validationErrors"
-      @cancelled="handleCancelled"
-    />
-  </loading-view>
+    <loading-view :loading="loading">
+        <custom-create-header class="mb-3" :resource-name="resourceName" />
+            <wizard-form
+                :navigation="$route.navigable"
+                :resource-name="resourceName"
+                :resource-id="resourceId"
+                :via-resource="viaResource"
+                :via-resource-id="viaResourceId"
+                :via-relationship="viaRelationship"
+                :panels="panelsWithFields"
+                :next-handler="handleNext"
+                :previous-handler="handlePrevious"
+                :submit-handler="handleSubmit"
+                :submit="__('Create :resource', { resource: singularName })"
+                :submit-and-stay="__('Create & Add Another')"
+                :validation-errors="validationErrors"
+                @cancelled="handleCancelled"
+            />
+    </loading-view>
 </template>
 
 <script>
@@ -55,23 +55,23 @@ export default {
 
   async created() {
     if (Nova.missingResource(this.resourceName))
-      return this.$router.push({ name: '404' })
+      return this.$router.push({name: '404'})
 
     this.initializeStep()
 
     // If this create is via a relation index, then let's grab the field
     // and use the label for that as the one we use for the title and buttons
     if (this.isRelation) {
-      const { data } = await Nova.request().get(
-        '/nova-api/' + this.viaResource + '/field/' + this.viaRelationship,
-        {
-          params: {
-            resourceName: this.resourceName,
-            viaResource: this.viaResource,
-            viaResourceId: this.viaResourceId,
-            viaRelationship: this.viaRelationship,
-          },
-        }
+      const {data} = await Nova.request().get(
+          '/nova-api/' + this.viaResource + '/field/' + this.viaRelationship,
+          {
+            params: {
+              resourceName: this.resourceName,
+              viaResource: this.viaResource,
+              viaResourceId: this.viaResourceId,
+              viaRelationship: this.viaRelationship,
+            },
+          }
       )
       this.relationResponse = data
 
@@ -91,7 +91,6 @@ export default {
     this.getFields()
   },
 
-
   methods: {
     /**
      * Get the available fields for the resource.
@@ -101,19 +100,19 @@ export default {
       this.fields = []
 
       const {
-        data: { panels, fields },
+        data: {panels, fields},
       } = await Nova.request().get(
-        `/nova-api/${this.resourceName}/step/${this.step}/creation-fields`,
-        {
-          params: {
-            editing: true,
-            editMode: 'create',
-            resourceId: this.resourceId,
-            viaResource: this.viaResource,
-            viaResourceId: this.viaResourceId,
-            viaRelationship: this.viaRelationship,
-          },
-        }
+          `/nova-api/${this.resourceName}/step/${this.step}/creation-fields`,
+          {
+            params: {
+              editing: true,
+              editMode: 'create',
+              resourceId: this.resourceId,
+              viaResource: this.viaResource,
+              viaResourceId: this.viaResourceId,
+              viaRelationship: this.viaRelationship,
+            },
+          }
       )
 
       this.panels = panels
@@ -122,22 +121,21 @@ export default {
     },
 
     handleCancelled(formData) {
-      if (this.mode == 'form') {
-        if(!this.resourceId)
-        {
+      if (this.mode === 'form') {
+        if (!this.resourceId) {
           return this.$router.back()
         }
 
         Nova.request().post(
-        `/nova-api/${this.resourceName}/step/${this.step}/cancelled`,
-        formData,
-        {
-          params: {
-            resourceId: this.resourceId,
-            resource: this.resource,
-            resourceName: this.resourceName,
-          },
-        });
+            `/nova-api/${this.resourceName}/step/${this.step}/cancelled`,
+            formData,
+            {
+              params: {
+                resourceId: this.resourceId,
+                resource: this.resource,
+                resourceName: this.resourceName,
+              },
+            });
 
         return this.$router.back();
       }
@@ -148,18 +146,18 @@ export default {
     async handleNext(formData) {
       try {
         const {
-          data: { redirect, id },
+          data: {redirect, id},
         } = await this.checkpointRequest(formData, this.currentPanel.checkpoint !== true)
 
-        if(this.currentPanel.checkpoint !== true)
+        if (this.currentPanel.checkpoint !== true)
           Nova.success(
-            this.__('The session was saved!')
+              this.__('The session was saved!')
           )
         else
           Nova.success(
-            this.__('The :resource was created!', {
-              resource: this.resourceInformation.singularLabel.toLowerCase(),
-            })
+              this.__('The :resource was created!', {
+                resource: this.resourceInformation.singularLabel.toLowerCase(),
+              })
           )
 
         this.validationErrors = new Errors()
@@ -168,7 +166,7 @@ export default {
 
         await this.getFields()
       } catch (error) {
-        if (error.response.status == 422) {
+        if (error.response.status === 422) {
           this.validationErrors = new Errors(error.response.data.errors)
           Nova.error(this.__('There was a problem submitting the form.'))
         }
@@ -178,17 +176,17 @@ export default {
     async handleSubmit(formData, close) {
       try {
         const {
-          data: { redirect, id },
+          data: {redirect, id},
         } = await this.createRequest(formData)
 
         Nova.success(
-          this.__('The :resource was created!', {
-            resource: this.resourceInformation.singularLabel.toLowerCase(),
-          })
+            this.__('The :resource was created!', {
+              resource: this.resourceInformation.singularLabel.toLowerCase(),
+            })
         )
 
         if (close) {
-          this.$router.push({ path: redirect })
+          this.$router.push({path: redirect})
         } else {
           // Reset the form by refetching the fields
           this.validationErrors = new Errors()
@@ -197,7 +195,7 @@ export default {
         }
 
       } catch (error) {
-        if (error.response.status == 422) {
+        if (error.response.status === 422) {
           this.validationErrors = new Errors(error.response.data.errors)
           Nova.error(this.__('There was a problem submitting the form.'))
         }
@@ -209,17 +207,17 @@ export default {
      */
     checkpointRequest(formData, session = true) {
       return Nova.request().post(
-        `/nova-api/${this.resourceName}/step/${this.step}`,
-        formData,
-        {
-          params: {
-            editing: true,
-            editMode: 'create',
-            storeMode: 'checkpoint',
-            viaSession: session,
-            resourceId: this.resourceId,
-          },
-        }
+          `/nova-api/${this.resourceName}/step/${this.step}`,
+          formData,
+          {
+            params: {
+              editing: true,
+              editMode: 'create',
+              storeMode: 'checkpoint',
+              viaSession: session,
+              resourceId: this.resourceId,
+            },
+          }
       )
     },
 
@@ -228,21 +226,20 @@ export default {
      */
     createRequest(formData) {
       return Nova.request().post(
-        `/nova-api/${this.resourceName}/step/${this.step}`,
-        formData,
-        {
-          params: {
-            editing: true,
-            editMode: 'create',
-            storeMode: 'submit',
-            viaSession: false,
-            resourceId: this.resourceId,
-          },
-        }
+          `/nova-api/${this.resourceName}/step/${this.step}`,
+          formData,
+          {
+            params: {
+              editing: true,
+              editMode: 'create',
+              storeMode: 'submit',
+              viaSession: false,
+              resourceId: this.resourceId,
+            },
+          }
       )
     },
   },
-
 
   computed: {
     singularName() {
@@ -264,7 +261,6 @@ export default {
     isHasOneRelationship() {
       return this.relationResponse && this.relationResponse.hasOneRelationship
     },
-
   },
 }
 </script>

@@ -1,88 +1,84 @@
 <template>
-  <div>
-    <wizard-nav v-if="navigation && steps.length > 1" :steps="steps" :current="current" :class="'mb-6'"/>
+    <div>
+        <wizard-nav v-if="navigation && steps.length > 1" :steps="steps" :current="current" :class="'mb-6'" />
 
-    <form v-if="panels" autocomplete="off" ref="form" @submit="handleSubmitAndClose">
-      <form-panel
-        class="mb-8"
-        v-if="currentPanel"
-        @file-upload-started="handleFileUploadStarted"
-        @file-upload-finished="handleFileUploadFinished"
-        :shown-via-new-relation-modal="shownViaNewRelationModal"
-        :panel="currentPanel"
-        :name="currentPanel.name"
-        :key="currentPanel.name"
-        :resource-name="resourceName"
-        :resource-id="resourceId"
-        :fields="currentPanel.fields"
-        mode="form"
-        :validation-errors="validationErrors"
-        :via-resource="viaResource"
-        :via-resource-id="viaResourceId"
-        :via-relationship="viaRelationship"
-      />
+        <form v-if="panels" autocomplete="off" ref="form" @submit="handleSubmitAndClose">
+            <form-panel
+                class="mb-8"
+                v-if="currentPanel"
+                @file-upload-started="handleFileUploadStarted"
+                @file-upload-finished="handleFileUploadFinished"
+                :shown-via-new-relation-modal="shownViaNewRelationModal"
+                :panel="currentPanel"
+                :name="currentPanel.name"
+                :key="currentPanel.name"
+                :resource-name="resourceName"
+                :resource-id="resourceId"
+                :fields="currentPanel.fields"
+                mode="form"
+                :validation-errors="validationErrors"
+                :via-resource="viaResource"
+                :via-resource-id="viaResourceId"
+                :via-relationship="viaRelationship"
+            />
 
-      <!-- Create Button -->
-      <div class="flex items-center">
-        <cancel-button @click="$emit('cancelled')" />
+          <!-- Create Button -->
+            <div class="flex items-center">
+                <cancel-button @click="$emit('cancelled')" />
 
-        <progress-button
-          dusk="previous-step"
-          class="mr-3"
-          @click.native="handlePreviousStep"
-          v-if="current"
-          :disabled="isWorking"
-          :processing="false"
-        >
-          {{ __('Previous') }}
-        </progress-button>
+                <progress-button
+                    dusk="previous-step"
+                    class="mr-3"
+                    @click.native="handlePreviousStep"
+                    v-if="current"
+                    :disabled="isWorking"
+                    :processing="false"
+                >
+                  {{ __('Previous') }}
+                </progress-button>
 
-        <progress-button
-          dusk="next-step"
-          class="mr-3"
-          @click.native="handleNextStep"
-          :disabled="current == steps.length - 1 || isWorking"
-          v-if="current < steps.length - 1"
-          :processing="isWorking"
-        >
-          {{ __('Next') }}
-        </progress-button>
+                <progress-button
+                    dusk="next-step"
+                    class="mr-3"
+                    @click.native="handleNextStep"
+                    :disabled="current === steps.length - 1 || isWorking"
+                    v-if="current < steps.length - 1"
+                    :processing="isWorking"
+                >
+                  {{ __('Next') }}
+                </progress-button>
 
-        <progress-button
-          dusk="submit-and-stay-step"
-          class="mr-3"
-          @click.native="handleSubmitAndStay"
-          :disabled="isWorking"
-          v-if="current == steps.length - 1"
-          :processing="wasSubmitedViaClose"
-        >
-          {{ submitAndStay }}
-        </progress-button>
+                <progress-button
+                    dusk="submit-and-stay-step"
+                    class="mr-3"
+                    @click.native="handleSubmitAndStay"
+                    :disabled="isWorking"
+                    v-if="current === steps.length - 1"
+                    :processing="wasSubmitedViaClose"
+                >
+                  {{ submitAndStay }}
+                </progress-button>
 
-        <progress-button
-          dusk="submit-step"
-          class="mr-3"
-          @click.native="handleSubmitAndClose"
-          :disabled="isWorking"
-          v-if="current == steps.length - 1"
-          :processing="submitd"
-        >
-          {{ submit }}
-        </progress-button>
+                <progress-button
+                    dusk="submit-step"
+                    class="mr-3"
+                    @click.native="handleSubmitAndClose"
+                    :disabled="isWorking"
+                    v-if="current === steps.length - 1"
+                    :processing="submitd"
+                >
+                  {{ submit }}
+                </progress-button>
 
 
-        <!-- <slot v-if="current == steps.length - 1" scope="buttons"></slot> -->
-
-      </div>
-    </form>
-  </div>
+              <!-- <slot v-if="current == steps.length - 1" scope="buttons"></slot> -->
+           </div>
+        </form>
+    </div>
 </template>
 
 <script>
-import {
-  mapProps,
-  Errors
-} from 'laravel-nova'
+import {mapProps, Errors} from 'laravel-nova'
 import HandlesUploads from './HandlesUploads'
 
 export default {
@@ -147,10 +143,10 @@ export default {
   }),
 
   async beforeDestroy() {
-      // We need to clear the variables from the session to prevent issues in new instances of the form
-      await Nova.request().post(
+    // We need to clear the variables from the session to prevent issues in new instances of the form
+    await Nova.request().post(
         `/nova-api/${this.resourceName}/step/${this.current}/clear`
-      );
+    );
   },
 
   methods: {
@@ -193,11 +189,11 @@ export default {
 
   computed: {
     current() {
-      return _.findIndex(this.steps, (step) => ! step.passed)
+      return _.findIndex(this.steps, (step) => !step.passed)
     },
 
     steps() {
-      return this.panels.filter(panel => panel.step != undefined)
+      return this.panels.filter(panel => panel.step !== undefined)
     },
 
     currentPanel() {

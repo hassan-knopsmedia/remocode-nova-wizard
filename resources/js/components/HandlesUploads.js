@@ -1,19 +1,19 @@
 export default {
-  data: () => ({ isWorking: false }),
+	data: () => ({isWorking: false}),
 
-  methods: {
-    /**
-     * Handle file upload finishing
-     */
-    handleFileUploadFinished() {
-      this.isWorking = false
-    },
+	methods: {
+		/**
+		 * Handle file upload finishing
+		 */
+		handleFileUploadFinished() {
+			this.isWorking = false
+		},
 
-    /**
-     * Handle file upload starting
-     */
-    handleFileUploadStarted() {
-      this.isWorking = true
-    },
-  },
+		/**
+		 * Handle file upload starting
+		 */
+		handleFileUploadStarted() {
+			this.isWorking = true
+		},
+	},
 }
