@@ -20,7 +20,7 @@ This package gives you the ability to `creating` or `updating` a resource step b
 To get started with `nova-wizard` run the below command:
 
 ```    
-    composer require Jbworld/nova-wizard
+    composer require remocodebe/nova-wizard
 ```
 
 ## Resource Configurations
@@ -28,8 +28,8 @@ To get started with `nova-wizard` run the below command:
 To use, your resource class should implement the `Wizard` interface. Then for creating each step use the `Step` class like the following:
 
 ```     
-    use Jbworld\NovaWizard\Contracts\Wizard; 
-    use Jbworld\NovaWizard\Step;
+    use Remocodebe\NovaWizard\Contracts\Wizard; 
+    use Remocodebe\NovaWizard\Step;
 
 
     
@@ -64,4 +64,4 @@ By default; each step, except the last, will store in the session. if you need t
 
 ## Ignore Wizard On Update
 
-For ignoring `wizard-form` on the update page, your resource should implement the `Jbworld\NovaWizard\Contracts\IgnoreUpdateWizard`. 
+For ignoring `wizard-form` on the update page, your resource should implement the `Remocodebe\NovaWizard\Contracts\IgnoreUpdateWizard`. 

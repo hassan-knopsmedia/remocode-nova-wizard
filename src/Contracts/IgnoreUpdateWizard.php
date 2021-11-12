@@ -1,6 +1,6 @@
 <?php
 
-namespace Jbworld\NovaWizard\Contracts;
+namespace Remocodebe\NovaWizard\Contracts;
  
 
 interface IgnoreUpdateWizard 

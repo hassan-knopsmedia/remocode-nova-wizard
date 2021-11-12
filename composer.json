@@ -1,5 +1,5 @@
 {
-    "name": "jbworldllc/nova-wizard",
+    "name": "remocodebe/nova-wizard",
     "description": "A Laravel Nova tool.",
     "keywords": [
         "laravel",
@@ -11,13 +11,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Jbworld\\NovaWizard\\": "src/"
+            "Remocodebe\\NovaWizard\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Jbworld\\NovaWizard\\ToolServiceProvider"
+                "Remocodebe\\NovaWizard\\ToolServiceProvider"
             ]
         }
     },
